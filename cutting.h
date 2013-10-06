@@ -113,7 +113,7 @@ int solve(struct solution problem) {
 }
 
 
-int read(char const* file, struct solution* output) {
+int read(char const* file, struct solution* output, int a) {
 	FILE *fpointer = 0;
 	if ((fpointer = fopen(file, "r"))) {
 		fseek(fpointer, 0, SEEK_END);
@@ -151,8 +151,10 @@ int read(char const* file, struct solution* output) {
 					while(*buffer != ' ')
 						buffer++;
 					buffer++;
-					//output->patterns[i].value = output->patterns[i].x*output->patterns[i].y;
-					output->patterns[i].value = atoi(buffer);
+					if (a)
+						output->patterns[i].value = output->patterns[i].x*output->patterns[i].y;
+					else
+						output->patterns[i].value = atoi(buffer);
 					while(*buffer != ' ')
 						buffer++;
 					buffer++;

@@ -5,6 +5,7 @@ Exact algorithm for resolution of two-dimensional constrained cutting problems.
 
 It only reads files in the following structure:
 > \[ Sheet Dimension \] \[ Sheet Dimension \] \[ Number of Patterns \]
+>
 > \[ Pattern Dimension \] \[ Pattern Dimension \] \[ Pattern Value \] \[ Pattern Maximum Quantity \]
 >
 
