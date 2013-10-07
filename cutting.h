@@ -52,29 +52,46 @@ int cut_b(struct plane sheet, struct pattern type, struct plane newPieces[]) {
 }
 
 int run(struct plane sheet, struct pattern types[], int types_size, int solution[]) {
-
 	int i = 0;
-	
+
+	#ifdef PRINT_TREE
 	static int depth = 0;
+	#endif
+
 	int temp_sol[types_size];
 	for(; i < types_size; i++)
 		temp_sol[i] = solution[i];
 
 	int optimum = 0;
-	struct plane results_a[2], results_b[2];
+	struct plane results[2];
 	int j;
 	for (i = 0; i < types_size; i++)
 		if (types[i].max > solution[i]) {
+			#ifdef PRINT_TREE
 			depth++;
+			#endif
+
 			int sol_a[types_size], sol_b[types_size];
 
-			if (cut_a(sheet,types[i],results_a)) {
+			if (cut_a(sheet,types[i],results)) {
+				#ifdef PRINT_TREE
+				for (j = 0; j < depth; j++)
+					printf("\t");	
+				printf("CUTTING A: { %d %d } with [%d] %d %d into { %d %d, %d %d } = [ ", sheet.x,sheet.y,  i,  types[i].x,types[i].y, results[0].x,results[0].y, results[1].x,results[1].y);
+				#endif
+
 				for (j = 0; j < types_size; j++)
 					sol_a[j] = solution[j];
 				sol_a[i]++;
 
-				int a = run(results_a[0],types,types_size, sol_a);
-				int b = run(results_a[1],types,types_size, sol_a);
+				#ifdef PRINT_TREE
+				for (j = 0; j < types_size; j++)
+					printf("%d ", sol_a[j]);
+				printf("]\n");
+				#endif
+
+				int a = run(results[0],types,types_size, sol_a);
+				int b = run(results[1],types,types_size, sol_a);
 				
 				if (types[i].value + a + b > optimum) {
 					optimum = types[i].value + a + b;
@@ -83,13 +100,25 @@ int run(struct plane sheet, struct pattern types[], int types_size, int solution
 				}
 			}
 
-			if (cut_b(sheet,types[i],results_b)) {
+			if (cut_b(sheet,types[i],results)) {
+				#ifdef PRINT_TREE
+				for (j = 0; j < depth; j++)
+					printf("\t");	
+				printf("CUTTING B: { %d %d } with [%d] %d %d into { %d %d, %d %d } = [ ", sheet.x,sheet.y,  i,  types[i].x,types[i].y, results[0].x,results[0].y, results[1].x,results[1].y);
+				#endif
+
 				for (j = 0; j < types_size; j++)
 					sol_b[j] = solution[j];
 				sol_b[i]++;
 
-				int a = run(results_b[0],types,types_size, sol_b);
-				int b = run(results_b[1],types,types_size, sol_b);
+				#ifdef PRINT_TREE
+				for (j = 0; j < types_size; j++)
+					printf("%d ", sol_a[j]);
+				printf("]\n");
+				#endif
+
+				int a = run(results[0],types,types_size, sol_b);
+				int b = run(results[1],types,types_size, sol_b);
 				
 				if (types[i].value + a + b > optimum) {
 					optimum = types[i].value + a + b;
@@ -98,17 +127,36 @@ int run(struct plane sheet, struct pattern types[], int types_size, int solution
 				}
 			}
 			
-			for(j = 0; j < types_size; j++)
-				solution[j] = temp_sol[j];
-
+			#ifdef PRINT_TREE
 			depth--;
+			#endif
 		}
+
+	if (optimum)
+	{
+		#ifdef PRINT_TREE
+		printf("\n");
+		for (j = 0; j < depth; j++)
+			printf("\t");
+		int tmp = 0;
+		#endif
+		for(j = 0; j < types_size; j++) {
+			solution[j] = temp_sol[j];
+			#ifdef PRINT_TREE
+			tmp += solution[j] * types[j].x * types[j].y;
+			printf("%d ", temp_sol[j]);
+			#endif
+		}
+		#ifdef PRINT_TREE
+		printf(": %d", tmp);
+		printf("\n\n");
+		#endif
+	}
 
 	return optimum;
 }
 
 int solve(struct solution problem) {
-	printf("%dx%d, %d patterns\n", problem.sheet.x, problem.sheet.y, problem.size);
 	return run(problem.sheet, problem.patterns, problem.size, problem.optimum);
 }
 
